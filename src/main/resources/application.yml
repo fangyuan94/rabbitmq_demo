@@ -1,0 +1,53 @@
+server:
+  port: 8091
+spring:
+  rabbitmq:
+    addresses: localhost:5672
+    username: admin
+    password: admin
+    virtual-host: my_vhost
+    ##通过returnCallback
+    publisher-returns: true
+    ##通过confirmCallback
+    publisher-confirm-type: correlated
+    listener:
+#      type: direct
+#      direct:
+#        acknowledge-mode: manual
+#        auto-startup: true
+#        consumers-per-queue: 2
+#        retry:
+#          enabled: false
+#        missing-queues-fatal: true
+#        default-requeue-rejected: true
+#        idle-event-interval: 10000
+      type: simple
+      simple:
+        ##这里使用none后续对此进行详细描述
+        acknowledge-mode: manual
+        auto-startup: true
+        ##设置消费并行度
+        concurrency: 1
+        ##设置最大并行度
+        max-concurrency: 1
+        ##设置一个批次从mq服务中最大拉取数量
+        batch-size: 3
+        ##不开启重试 避免重复消费
+        retry:
+          enabled: false
+        ## 每个消费者可能未完成的未确认消息的最大数量
+        #prefetch:
+        ## 若容器中声明的的queue不存在了(queue在代理上不可用或在运行时被删除了) 是否需要停止对应容器默认true
+        missing-queues-fatal: true
+        ## 默认情况下，拒绝交付是否重新排队
+        default-requeue-rejected: true
+        # 应该多久发布一次空闲容器事件 可用于监控
+        idle-event-interval: 10000
+        ##该值代表每个customer会在MQ预取一些消息放入内存的LinkedBlockingQueue中，这个值越高，消息传递的越快
+        ##在2.0起默认为250
+        prefetch: 1
+
+    template:
+      mandatory: true
+
+
